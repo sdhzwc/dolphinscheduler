@@ -21,10 +21,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.dolphinscheduler.common.utils.JSONUtils.parseObject;
 
 import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
@@ -63,6 +65,9 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
 
     @Autowired
     protected List<IWorkflowLifecycleListener> workflowLifecycleListeners;
+
+    @Autowired
+    protected ProjectDao projectDao;
 
     @Override
     public WorkflowExecutionRunnable handleCommand(final Command command) {
@@ -106,6 +111,10 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
         checkArgument(workflowDefinition != null,
                 "Cannot find the WorkflowDefinition: [" + workflowDefinitionCode + ":" + workflowDefinitionVersion
                         + "]");
+        Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
+        if (project != null) {
+            workflowDefinition.setProjectName(project.getName());
+        }
         workflowExecuteContextBuilder.setWorkflowDefinition(workflowDefinition);
 
     }
