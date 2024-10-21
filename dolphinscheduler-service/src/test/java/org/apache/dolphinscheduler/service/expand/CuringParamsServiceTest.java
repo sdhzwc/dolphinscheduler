@@ -221,7 +221,8 @@ public class CuringParamsServiceTest {
         Mockito.when(projectParameterMapper.queryByProjectCode(Mockito.anyLong())).thenReturn(Collections.emptyList());
 
         Map<String, Property> propertyMap =
-                dolphinSchedulerCuringGlobalParams.paramParsingPreparation(taskInstance, parameters, workflowInstance);
+                dolphinSchedulerCuringGlobalParams.paramParsingPreparation(taskInstance, parameters, workflowInstance,
+                        workflowDefinition);
         Assertions.assertNotNull(propertyMap);
         Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_TASK_INSTANCE_ID).getValue(),
                 String.valueOf(taskInstance.getId()));

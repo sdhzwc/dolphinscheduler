@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.service.expand;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -80,7 +81,8 @@ public interface CuringParamsService {
      */
     Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance,
                                                   @NonNull AbstractParameters parameters,
-                                                  @NonNull WorkflowInstance workflowInstance);
+                                                  @NonNull WorkflowInstance workflowInstance,
+                                                  @NonNull WorkflowDefinition workflowDefinition);
 
     /**
      * Parse workflow star parameter

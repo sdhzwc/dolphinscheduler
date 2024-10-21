@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.dao.entity.ProjectParameter;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectParameterMapper;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
@@ -185,7 +186,8 @@ public class CuringParamsServiceImpl implements CuringParamsService {
     @Override
     public Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance,
                                                          @NonNull AbstractParameters parameters,
-                                                         @NonNull WorkflowInstance workflowInstance) {
+                                                         @NonNull WorkflowInstance workflowInstance,
+                                                         @NonNull WorkflowDefinition workflowDefinition) {
         Map<String, Property> prepareParamsMap = new HashMap<>();
 
         // assign value to definedParams here
@@ -205,7 +207,8 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         String timeZone = commandParam.getTimeZone();
 
         // built-in params
-        Map<String, String> builtInParams = setBuiltInParamsMap(taskInstance, workflowInstance, timeZone);
+        Map<String, String> builtInParams =
+                setBuiltInParamsMap(taskInstance, workflowInstance, timeZone, workflowDefinition);
 
         // project-level params
         Map<String, Property> projectParams = getProjectParameterMap(taskInstance.getProjectCode());
@@ -276,7 +279,8 @@ public class CuringParamsServiceImpl implements CuringParamsService {
      */
     private Map<String, String> setBuiltInParamsMap(@NonNull TaskInstance taskInstance,
                                                     WorkflowInstance workflowInstance,
-                                                    String timeZone) {
+                                                    String timeZone,
+                                                    WorkflowDefinition workflowDefinition) {
         CommandType commandType = workflowInstance.getCmdTypeIfComplement();
         Date scheduleTime = workflowInstance.getScheduleTime();
 
@@ -289,10 +293,9 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         params.put(PARAMETER_TASK_DEFINITION_NAME, taskInstance.getName());
         params.put(PARAMETER_TASK_DEFINITION_CODE, Long.toString(taskInstance.getTaskCode()));
         params.put(PARAMETER_WORKFLOW_INSTANCE_ID, Integer.toString(taskInstance.getWorkflowInstanceId()));
-        // todo: set workflow definitionName and projectName
-        params.put(PARAMETER_WORKFLOW_DEFINITION_NAME, null);
+        params.put(PARAMETER_WORKFLOW_DEFINITION_NAME, workflowDefinition.getName());
         params.put(PARAMETER_WORKFLOW_DEFINITION_CODE, Long.toString(workflowInstance.getWorkflowDefinitionCode()));
-        params.put(PARAMETER_PROJECT_NAME, null);
+        params.put(PARAMETER_PROJECT_NAME, workflowDefinition.getProjectName());
         params.put(PARAMETER_PROJECT_CODE, Long.toString(workflowInstance.getProjectCode()));
         return params;
     }

@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
@@ -98,6 +99,7 @@ public class TaskExecutionContextFactory {
     public TaskExecutionContext createTaskExecutionContext(TaskExecutionContextCreateRequest request) {
         TaskInstance taskInstance = request.getTaskInstance();
         WorkflowInstance workflowInstance = request.getWorkflowInstance();
+        WorkflowDefinition workflowDefinition = request.getWorkflowDefinition();
 
         ResourceParametersHelper resources = TaskPluginManager.getTaskChannel(taskInstance.getTaskType())
                 .parseParameters(taskInstance.getTaskParams())
@@ -109,7 +111,8 @@ public class TaskExecutionContextFactory {
         AbstractParameters baseParam =
                 TaskPluginManager.parseTaskParameters(taskInstance.getTaskType(), taskInstance.getTaskParams());
         Map<String, Property> propertyMap =
-                curingParamsService.paramParsingPreparation(taskInstance, baseParam, workflowInstance);
+                curingParamsService.paramParsingPreparation(taskInstance, baseParam, workflowInstance,
+                        workflowDefinition);
         TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
                 .buildWorkflowInstanceHost(masterConfig.getMasterAddress())
                 .buildTaskInstanceRelatedInfo(taskInstance)

@@ -45,10 +45,11 @@
     <select id="queryByDefinitionCodeAndVersion"
             resultType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog">
         select
-        <include refid="baseSql"/>
-        from t_ds_workflow_definition_log
-        where code = #{code}
-        and version = #{version}
+            pd.*, p.name as project_name
+        from t_ds_workflow_definition_log pd
+        left join t_ds_project p ON pd.project_code = p.code
+        where pd.code = #{code}
+        and pd.version = #{version}
     </select>
     <select id="queryMaxVersionForDefinition" resultType="java.lang.Integer">
         select max(version)
