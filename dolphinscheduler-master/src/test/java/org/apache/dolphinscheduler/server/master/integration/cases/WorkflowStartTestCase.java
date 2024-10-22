@@ -709,4 +709,30 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
         assertThat(workflowRepository.getAll()).isEmpty();
     }
+
+    @Test
+    @DisplayName("Test start a workflow with one fake task success")
+    public void testStartWorkflow_with_oneSuccessFakeTask() {
+        final String yaml = "/it/start/workflow_with_one_fake_task_success.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(context.getWorkflows().get(0))
+                .project(context.getProject())
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .build();
+        workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(workflowTriggerDTO.getProject().getName())
+                            .isEqualTo("MasterIntegrationTest");
+                    Assertions
+                            .assertThat(workflowTriggerDTO.getWorkflowDefinition().getName())
+                            .isEqualTo("workflow_with_one_fake_task_success");
+                });
+
+    }
 }

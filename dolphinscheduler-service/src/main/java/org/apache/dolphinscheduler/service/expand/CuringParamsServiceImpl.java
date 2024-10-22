@@ -37,7 +37,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.dao.entity.ProjectParameter;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectParameterMapper;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
@@ -181,13 +180,16 @@ public class CuringParamsServiceImpl implements CuringParamsService {
      * @param taskInstance
      * @param parameters
      * @param workflowInstance
+     * @param projectName
+     * @param workflowDefinitionName
      * @return
      */
     @Override
     public Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance,
                                                          @NonNull AbstractParameters parameters,
                                                          @NonNull WorkflowInstance workflowInstance,
-                                                         @NonNull WorkflowDefinition workflowDefinition) {
+                                                         String projectName,
+                                                         String workflowDefinitionName) {
         Map<String, Property> prepareParamsMap = new HashMap<>();
 
         // assign value to definedParams here
@@ -208,7 +210,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
 
         // built-in params
         Map<String, String> builtInParams =
-                setBuiltInParamsMap(taskInstance, workflowInstance, timeZone, workflowDefinition);
+                setBuiltInParamsMap(taskInstance, workflowInstance, timeZone, projectName, workflowDefinitionName);
 
         // project-level params
         Map<String, Property> projectParams = getProjectParameterMap(taskInstance.getProjectCode());
@@ -276,11 +278,14 @@ public class CuringParamsServiceImpl implements CuringParamsService {
      *
      * @param taskInstance
      * @param timeZone
+     * @param projectName
+     * @param workflowDefinitionName
      */
     private Map<String, String> setBuiltInParamsMap(@NonNull TaskInstance taskInstance,
                                                     WorkflowInstance workflowInstance,
                                                     String timeZone,
-                                                    WorkflowDefinition workflowDefinition) {
+                                                    String projectName,
+                                                    String workflowDefinitionName) {
         CommandType commandType = workflowInstance.getCmdTypeIfComplement();
         Date scheduleTime = workflowInstance.getScheduleTime();
 
@@ -293,9 +298,9 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         params.put(PARAMETER_TASK_DEFINITION_NAME, taskInstance.getName());
         params.put(PARAMETER_TASK_DEFINITION_CODE, Long.toString(taskInstance.getTaskCode()));
         params.put(PARAMETER_WORKFLOW_INSTANCE_ID, Integer.toString(taskInstance.getWorkflowInstanceId()));
-        params.put(PARAMETER_WORKFLOW_DEFINITION_NAME, workflowDefinition.getName());
+        params.put(PARAMETER_WORKFLOW_DEFINITION_NAME, workflowDefinitionName);
         params.put(PARAMETER_WORKFLOW_DEFINITION_CODE, Long.toString(workflowInstance.getWorkflowDefinitionCode()));
-        params.put(PARAMETER_PROJECT_NAME, workflowDefinition.getProjectName());
+        params.put(PARAMETER_PROJECT_NAME, projectName);
         params.put(PARAMETER_PROJECT_CODE, Long.toString(workflowInstance.getProjectCode()));
         return params;
     }

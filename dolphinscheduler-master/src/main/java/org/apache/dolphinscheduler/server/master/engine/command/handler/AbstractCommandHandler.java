@@ -75,6 +75,7 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
                 .withCommand(command);
 
         assembleWorkflowDefinition(workflowExecuteContextBuilder);
+        assembleProject(workflowExecuteContextBuilder);
         assembleWorkflowGraph(workflowExecuteContextBuilder);
         assembleWorkflowInstance(workflowExecuteContextBuilder);
         assembleWorkflowInstanceLifecycleListeners(workflowExecuteContextBuilder);
@@ -111,10 +112,6 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
         checkArgument(workflowDefinition != null,
                 "Cannot find the WorkflowDefinition: [" + workflowDefinitionCode + ":" + workflowDefinitionVersion
                         + "]");
-        Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
-        if (project != null) {
-            workflowDefinition.setProjectName(project.getName());
-        }
         workflowExecuteContextBuilder.setWorkflowDefinition(workflowDefinition);
 
     }
@@ -153,6 +150,14 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
         return taskInstanceDao.queryValidTaskListByWorkflowInstanceId(
                 workflowInstance.getId(),
                 workflowInstance.getTestFlag());
+    }
+
+    protected void assembleProject(
+                                   final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
+        final WorkflowDefinition workflowDefinition = workflowExecuteContextBuilder.getWorkflowDefinition();
+        final Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
+        checkArgument(project != null, "Cannot find the project code: " + workflowDefinition.getProjectCode());
+        workflowExecuteContextBuilder.setProject(project);
     }
 
 }

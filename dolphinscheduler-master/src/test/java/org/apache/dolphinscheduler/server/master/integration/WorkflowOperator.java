@@ -140,6 +140,8 @@ public class WorkflowOperator {
 
         private final WorkflowDefinition workflowDefinition;
 
+        private final Project project;
+
         private final RunWorkflowCommandParam runWorkflowCommandParam;
 
         @Builder.Default
